@@ -1,65 +1,193 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader2 } from "lucide-react";
+
+export default function DashboardPage() {
+  const [pitches, setPitches] = useState<any[]>([]);
+  const [pitchCount, setPitchCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        // 1. Fetch total count of pitches in the database
+        const { count, error: countError } = await supabase
+          .from("pitches")
+          .select("*", { count: "exact", head: true });
+
+        if (countError) throw countError;
+        if (count !== null) setPitchCount(count);
+
+        // 2. Fetch the 10 most recent pitches to populate the table
+        const { data, error: fetchError } = await supabase
+          .from("pitches")
+          .select(
+            "pitch_type, rel_speed, spin_rate, induced_vert_break, horz_break, play_result",
+          )
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (fetchError) throw fetchError;
+        if (data) setPitches(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex-1 overflow-y-auto p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            System Dashboard
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground mt-2">
+            Live feed of recent pitch data ingested from the Python processing
+            engine.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <Separator />
+
+        {/* Top Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Pitches Tracked
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {loading ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                ) : (
+                  pitchCount
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Highest Velo (Recent)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {loading || pitches.length === 0
+                  ? "--"
+                  : Math.max(...pitches.map((p) => p.rel_speed || 0)).toFixed(
+                      1,
+                    )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Database Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div
+                className={`text-xl font-bold ${pitches.length > 0 ? "text-emerald-500" : "text-amber-500"}`}
+              >
+                {loading
+                  ? "Syncing..."
+                  : pitches.length > 0
+                    ? "Online & Synced"
+                    : "Awaiting Data"}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </main>
+
+        {/* Recent Pitches Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Pitches Feed</CardTitle>
+            <CardDescription>
+              The latest metrics parsed and normalized in your Supabase
+              database.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : pitches.length === 0 ? (
+              <div className="text-center p-8 text-muted-foreground">
+                No pitches found. Upload a CSV to get started.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pitch</TableHead>
+                    <TableHead>Velo (mph)</TableHead>
+                    <TableHead>Spin (rpm)</TableHead>
+                    <TableHead>IVB (in)</TableHead>
+                    <TableHead>HB (in)</TableHead>
+                    <TableHead>Result</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pitches.map((pitch, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        {pitch.pitch_type || "Unknown"}
+                      </TableCell>
+                      <TableCell className="text-emerald-500 font-semibold">
+                        {pitch.rel_speed?.toFixed(1) || "--"}
+                      </TableCell>
+                      <TableCell>
+                        {pitch.spin_rate?.toFixed(0) || "--"}
+                      </TableCell>
+                      <TableCell>
+                        {pitch.induced_vert_break?.toFixed(1) || "--"}
+                      </TableCell>
+                      <TableCell>
+                        {pitch.horz_break?.toFixed(1) || "--"}
+                      </TableCell>
+                      <TableCell className="capitalize">
+                        {pitch.play_result || "--"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
