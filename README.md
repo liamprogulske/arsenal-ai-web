@@ -16,13 +16,13 @@ A modern, high-performance web dashboard built for baseball analytics, performan
 ### 📊 Application Preview
 
 <p align="center">
-  <img src="/dashboard-view.png" alt="Arsenal AI Dashboard" width="800px" />
+  <img src="public/dashboard-view.png" alt="Arsenal AI Dashboard" width="800px" />
   <br>
   <em>Interactive Pitcher's Perspective Grid & Hover Metrics</em>
 </p>
 
 <p align="center">
-  <img src="/savant-profile.png" alt="Advanced Savant Metrics Profile" width="800px" />
+  <img src="public/savant-profile.png" alt="Advanced Savant Metrics Profile" width="800px" />
   <br>
   <em>Per-Pitch Savant Metrics (Whiff%, CSW%, Hard-Hit%)</em>
 </p>
