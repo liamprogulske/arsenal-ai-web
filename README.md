@@ -24,15 +24,18 @@ A modern, high-performance web dashboard built for baseball analytics, performan
    ```bash
    git clone [https://github.com/liamprogulske/arsenal-ai-web.git](https://github.com/liamprogulske/arsenal-ai-web.git)
    ```
+   
 2. Install dependencies:
    ```bash
    npm install
    ```
+   
 4. Configure your environment variables in a `.env.local` file:
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+   
 6. Run the development server:
    ```bash
    npm run dev
