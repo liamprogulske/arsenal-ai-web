@@ -28,7 +28,7 @@ A modern, high-performance web dashboard built for baseball analytics, performan
    ```bash
    npm install
    ```
-4. Configure your environment variables in a '.env.local' file:
+4. Configure your environment variables in a `.env.local` file:
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
