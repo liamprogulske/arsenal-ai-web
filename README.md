@@ -13,6 +13,20 @@ A modern, high-performance web dashboard built for baseball analytics, performan
 - **Advanced Savant-Style Profiles:** Dynamic roster filtering that aggregates lifetime data across multiple outings, computing metrics like Whiff%, CSW%, Average Exit Velocity, and Hard-Hit Rate per pitch type.
 - **Data Ingestion Engine:** Direct file-transfer bridge to the Python backend parsing raw Trackman CSV spreadsheets.
 
+### 📊 Application Preview
+
+<p align="center">
+  <img src="/dashboard-view.png" alt="Arsenal AI Dashboard" width="800px" />
+  <br>
+  <em>Interactive Pitcher's Perspective Grid & Hover Metrics</em>
+</p>
+
+<p align="center">
+  <img src="/savant-profile.png" alt="Advanced Savant Metrics Profile" width="800px" />
+  <br>
+  <em>Per-Pitch Savant Metrics (Whiff%, CSW%, Hard-Hit%)</em>
+</p>
+
 ## 🛠️ Tech Stack
 - **Framework:** Next.js (App Router, React Server/Client Components)
 - **Styling:** Tailwind CSS, Shadcn UI primitives
